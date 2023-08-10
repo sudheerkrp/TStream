@@ -19,6 +19,8 @@ import Image from "next/image";
 import { ChangeEvent, useState } from "react";
 import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from "@/lib/uploadthing";
+import { updateUser } from "@/lib/actions/user.actions";
+import { usePathname, useRouter } from "next/navigation";
 
 
 interface Props {
@@ -36,6 +38,8 @@ interface Props {
 const AccountProfile = ({ user, btnTitle }: Props) => {
     const [files, setFiles] = useState<File[]>([]);
     const { startUpload } = useUploadThing("media");
+    const router = useRouter();
+    const pathname = usePathname();
     const form = useForm({
         resolver: zodResolver(UserValidation),
         defaultValues: {
@@ -76,7 +80,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
             }
         }
 
-        // To-Do: Update user profile
+        await updateUser({image: values.profile_photo, name: values.name, username: values.username, bio: values.bio, userId: user.id, path: pathname});
+
+        if(pathname === "/profile/edit")
+            router.back();
+        else
+            router.push("/");
     }
 
     return (
@@ -100,6 +109,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                             <FormControl className="flex-1 text-base-semibold text-gray-200">
                                 <Input type="file" accept="image/*" placeholder="Upload a photo" className="account-form_image-input" onChange={(e) => handelImage(e, field.onChange)} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -115,6 +125,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                             <FormControl>
                                 <Input type="text" className="account-form_input no-focus" {...field} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -130,6 +141,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                             <FormControl>
                                 <Input type="text" className="account-form_input no-focus" {...field} />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
