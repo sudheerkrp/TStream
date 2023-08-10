@@ -50,3 +50,22 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20)
     }
 }
 
+export async function fetchStreamById(id: string)
+{
+    connectToDB();
+    try
+    {
+        // To-Do: Populate Community
+        const stream = await Stream.findById(id).populate({path: "author", model: User, select: "_id id name image"}).populate({path: "children", populate: [
+            {path: "author", model: User, select: "_id id name parentId image"}, {path: "children", model: Stream, populate: {
+                path: "author", model: User, select: "_id id name parentId image"
+            }}
+        ]}).exec();
+        return stream;
+    }
+    catch(err: any)
+    {
+        throw new Error(`Failed to fetch stream ${err.message}`);
+    }
+}
+
