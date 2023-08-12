@@ -11,61 +11,74 @@ interface Params {
     path: string
 }
 
-export async function createStream({text, author, communityId, path}: Params)
-{
+export async function createStream({ text, author, communityId, path }: Params) {
     connectToDB();
-    try
-    {
-        const createStream = await Stream.create({text, author, community: null});
+    try {
+        const createStream = await Stream.create({ text, author, community: null });
 
         await User.findByIdAndUpdate(author, {
-            $push: {streams: createStream._id}
-        } );
+            $push: { streams: createStream._id }
+        });
         revalidatePath(path);
     }
-    catch(err: any)
-    {
+    catch (err: any) {
         throw new Error(`Failed to create stream ${err.message}`);
     }
 }
 
-export async function fetchPosts(pageNumber = 1, pageSize = 20)
-{
+export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     connectToDB();
-    try
-    {
-        const skipAmount = (pageNumber - 1)*pageSize;
-        const postsQuery = Stream.find({parentId: {$in: [null, undefined]}}).sort({createdAt: "desc"}).skip(skipAmount).limit(pageSize).populate({path: "author", model: User}).populate({path: "children", populate: {path: "author", model: User, select: "_id name parentId image"}});
+    try {
+        const skipAmount = (pageNumber - 1) * pageSize;
+        const postsQuery = Stream.find({ parentId: { $in: [null, undefined] } }).sort({ createdAt: "desc" }).skip(skipAmount).limit(pageSize).populate({ path: "author", model: User }).populate({ path: "children", populate: { path: "author", model: User, select: "_id name parentId image" } });
 
-        const totalPostsCount = await Stream.countDocuments({parentId: {$in: [null, undefined]}});
+        const totalPostsCount = await Stream.countDocuments({ parentId: { $in: [null, undefined] } });
 
         const posts = await postsQuery.exec();
 
         const isNext = totalPostsCount > skipAmount + posts.length;
-        return  {posts, isNext};
+        return { posts, isNext };
     }
-    catch(err: any)
-    {
+    catch (err: any) {
         throw new Error(`Failed to fetch streams ${err.message}`);
     }
 }
 
-export async function fetchStreamById(id: string)
-{
+export async function fetchStreamById(id: string) {
     connectToDB();
-    try
-    {
+    try {
         // To-Do: Populate Community
-        const stream = await Stream.findById(id).populate({path: "author", model: User, select: "_id id name image"}).populate({path: "children", populate: [
-            {path: "author", model: User, select: "_id id name parentId image"}, {path: "children", model: Stream, populate: {
-                path: "author", model: User, select: "_id id name parentId image"
-            }}
-        ]}).exec();
+        const stream = await Stream.findById(id).populate({ path: "author", model: User, select: "_id id name image" }).populate({
+            path: "children", populate: [
+                { path: "author", model: User, select: "_id id name parentId image" }, {
+                    path: "children", model: Stream, populate: {
+                        path: "author", model: User, select: "_id id name parentId image"
+                    }
+                }
+            ]
+        }).exec();
         return stream;
     }
-    catch(err: any)
-    {
+    catch (err: any) {
         throw new Error(`Failed to fetch stream ${err.message}`);
+    }
+}
+
+export async function addCommentToStream(streamId: string, commentText: string, userId: string, path: string) {
+    connectToDB();
+    try {
+        const originalStream = await Stream.findById(streamId);
+        if (!originalStream)
+            throw new Error("Stream not found.");
+        const commentStream = new Stream({ text: commentText, author: userId, parentId: streamId });
+
+        const savedCommentStream = await commentStream.save();
+        originalStream.children.push(savedCommentStream._id);
+        await originalStream.save();
+        revalidatePath(path);
+    }
+    catch (err: any) {
+        throw new Error(`Failed to add comment to stream ${err.message}`);
     }
 }
 

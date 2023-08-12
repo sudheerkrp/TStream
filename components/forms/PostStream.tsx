@@ -32,7 +32,7 @@ interface Props {
 }
 
 
-const PostStream = ({userId}: {userId: string}) => {
+const PostStream = ({ userId }: { userId: string }) => {
     const router = useRouter();
     const pathname = usePathname();
     const form = useForm({
@@ -44,7 +44,7 @@ const PostStream = ({userId}: {userId: string}) => {
     });
 
     const onSubmit = async (values: z.infer<typeof StreamValidation>) => {
-        await createStream({text: values.stream, author: userId, communityId: null, path: pathname});
+        await createStream({ text: values.stream, author: userId, communityId: null, path: pathname });
 
         router.push("/");
     }
