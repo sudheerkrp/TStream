@@ -94,3 +94,23 @@ export async function fetchUsers({userId, searchString = "", pageNumber = 1,page
         throw new Error(`Failed to fetch users ${err.message}`);
     }
 }
+
+export async function getActivity(userId: string){
+    try 
+    {
+        connectToDB();
+        
+        const userStreams = await Stream.find({author: userId});
+
+        const childStreamIds = userStreams.reduce((acc, userStream) => {
+            return acc.concat(userStream.children); // acc -> accumulator
+        }, []); // [] -> default accumulator
+
+        const replies = await Stream.find({_id: {$in: childStreamIds}, author: {$ne: userId}}).populate({path: "author", model: User, select: "name image _id"});
+        return replies;
+    }
+    catch (err: any)
+    {
+        throw new Error(`Failed to fetch activity ${err.message}`);
+    }
+}
