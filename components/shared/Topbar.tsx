@@ -11,8 +11,8 @@ function Topbar()
 
     return (
         <nav className="topbar">
-            <Link href="/" className="flex ite gap-4">
-                <Image src="/assets/logo.svg" alt="Logo" width={28} height={28}/>
+            <Link href="/" className="flex items-center gap-2">
+                <Image src="/assets/logo.svg" alt="Logo" width={45} height={45}/>
                 <p className="text-heading3-bold text-light-1 max-xs:hidden">TStream</p>
             </Link>
             <div className="flex items-center gap-1">

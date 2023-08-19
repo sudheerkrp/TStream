@@ -1,13 +1,14 @@
 import StreamCard from "@/components/cards/StreamCard";
 import { fetchPosts } from "@/lib/actions/stream.actions";
 import { currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
 
   const user = await currentUser();
+  if (!user)
+      redirect("/sign-in");
   const result = await fetchPosts(1, 30);
-
-  console.log(result);
 
   return (
     <>

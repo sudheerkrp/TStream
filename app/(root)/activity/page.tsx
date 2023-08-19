@@ -5,8 +5,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 const Page = async () => {
 	const user = await currentUser();
-	if (!user)
-		return null;
+    if (!user)
+        redirect("/sign-in");
 	const userInfo = await fetchUser(user.id);
 	if (!userInfo?.onboarded)
 		redirect("/onboarding");
