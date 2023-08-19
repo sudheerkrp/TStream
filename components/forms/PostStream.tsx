@@ -17,6 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { updateUser } from "@/lib/actions/user.actions";
 import { StreamValidation } from "@/lib/validations/stream";
 import { createStream } from "@/lib/actions/stream.actions";
+import { useOrganization } from "@clerk/nextjs";
 
 
 interface Props {
@@ -35,6 +36,7 @@ interface Props {
 const PostStream = ({ userId }: { userId: string }) => {
     const router = useRouter();
     const pathname = usePathname();
+    const { organization } = useOrganization();
     const form = useForm({
         resolver: zodResolver(StreamValidation),
         defaultValues: {
@@ -44,7 +46,7 @@ const PostStream = ({ userId }: { userId: string }) => {
     });
 
     const onSubmit = async (values: z.infer<typeof StreamValidation>) => {
-        await createStream({ text: values.stream, author: userId, communityId: null, path: pathname });
+        await createStream({ text: values.stream, author: userId, communityId: (organization)?(organization.id):(null), path: pathname });
 
         router.push("/");
     }

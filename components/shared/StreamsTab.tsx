@@ -1,6 +1,7 @@
 import { fetchUserPosts } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import StreamCard from "../cards/StreamCard";
+import { fetchCommunityPosts } from "@/lib/actions/community.actions";
 
 interface Props {
     currentUserId: string;
@@ -8,7 +9,11 @@ interface Props {
     accountType: string;
 }
 const StreamsTab = async ({currentUserId, accountId, accountType}: Props) => {
-    const result = await fetchUserPosts(accountId);
+    let result: any;
+    if(accountType === "Community")
+        result = await fetchCommunityPosts(accountId);
+    else    
+        result = await fetchUserPosts(accountId);
     if(!result) 
         redirect("/");
     return (
