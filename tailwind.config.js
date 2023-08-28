@@ -192,6 +192,8 @@ module.exports = {
       boxShadow: {
         "count-badge": "0px 0px 6px 2px rgba(219, 188, 159, 0.30)",
         "groups-sidebar": "-30px 0px 60px 0px rgba(28, 28, 31, 0.50)",
+        "card": "0 0 1px 0 rgba(189,192,207,0.06),0 10px 16px -1px rgba(189,192,207,0.2)",
+        "card-hover": "0 0 1px 0 rgba(189,192,207,0.06),0 10px 16px -1px rgba(189,192,207,0.4)",
       },
       screens: {
         xs: "400px",

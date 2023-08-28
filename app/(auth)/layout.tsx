@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import '../globals.css';
 
 export const metadata = {
-    title: 'TStream',
-    description: 'TStream, a social media platform.'
+    title: 'TStream | Authentication',
+    description: 'TStream, a social media platform with extraordinary AI features.'
 }
 
 const inter = Inter({subsets: ["latin"]})
