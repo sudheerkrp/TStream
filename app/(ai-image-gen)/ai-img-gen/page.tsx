@@ -15,9 +15,10 @@ const RenderCard = ({data, title}: {data: Array<string>, title: string}) => {
 }
 
 const Page = () => {
-	const emptyArr: any[] = [];
 	const [loading, setLoading] = useState(false);
-	const [allAIImages, setAllAIImages] = useState(emptyArr);
+	const [allAIImages, setAllAIImages] = useState<any[]>([]);
+	const [searchResults, setSearchResults] = useState<any[]>([]);
+	const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
 	const [searchText, setSearchText] = useState("");
 
 	useEffect(() =>{
@@ -40,6 +41,15 @@ const Page = () => {
 		fetchAIImages();
 	}, []);
 
+	const handleSearchChange = (e: any) => {
+		clearTimeout(searchTimeout);
+		setSearchText(e.target.value);
+		setSearchTimeout(setTimeout(()=>{
+			const newSearchResults = allAIImages.filter((item) => item.name.toLowerCase().includes(searchText.toLocaleLowerCase()) || item.prompt.toLowerCase().includes(searchText.toLocaleLowerCase()));
+			setSearchResults(newSearchResults);
+		}, 500));
+	}
+
 	return (
 		<section className="max-w-7xl mx-auto">
 			<div>	
@@ -51,7 +61,7 @@ const Page = () => {
 				</p>
 			</div>
 			<div className="mt-16">
-				{/* <FormField /> */}
+			<FormField labelName="Search Images" type="text" name="text" placeholder="Search Images" value={searchText} handleChange={handleSearchChange}/>
 			</div>
 			<div className="mt-10">
 				{loading? (
@@ -66,8 +76,8 @@ const Page = () => {
 							</h2>
 						)} 
 						<div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
-							{searchText !== "" ? (
-								<RenderCard data={[]} title="No search results found" />
+							{searchText ? (
+								<RenderCard data={searchResults} title="No search results found" />
 							): (
 								<RenderCard data={allAIImages} title="No posts found" />
 							)}
