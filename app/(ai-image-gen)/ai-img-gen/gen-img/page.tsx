@@ -1,27 +1,71 @@
 "use client"
 import React, {useState} from 'react';
-import { redirect } from "next/navigation";
-
+import { useRouter } from 'next/router';
 import {preview} from "../../../../public/assets/";
 import { getRandomPrompt } from "../../../../lib/utils";
 import FormField from '@/components/forms/FormField';
 import Loader from '@/components/shared/Loader';
+import { generateAIImage } from '@/lib/actions/openAI.actions';
+import { saveAIImage } from '@/lib/actions/aiImage.actions';
 
 export default function Page() {
-
   const [form, setForm] = useState({
     name: "",
     prompt: "",
     photo: "",
   });
   const [generatingImg, setGeneratingImg] = useState(false);
+  const [cloudinaryUrl, setCloudinaryUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  // const router = useRouter();
 
-  const generateImage = () => {
-
+  const generateImage = async () => {
+    if(form.prompt)
+    {
+      try
+      {
+        setGeneratingImg(true);
+        const photo = await generateAIImage(form.prompt);
+        setForm({...form, photo: `data:image/jpeg;base64,${photo.image}`});
+        setCloudinaryUrl(photo.url);
+      }
+      catch(err) 
+      {
+        alert(err);
+      }
+      finally
+      {
+        setGeneratingImg(false);
+      }
+    }
+    else
+    {
+      alert("Please enter a prompt.");
+    }
   }
-  const handleSubmit = () => {
-
+  const handleSubmit = async () => {
+    if(cloudinaryUrl != "")
+    {
+      setLoading(true);
+      try
+      {
+        await saveAIImage({name: form.name, prompt: form.prompt, cloudinaryUrl: cloudinaryUrl});
+        alert("Image shared with community successfully!");
+        // router.push("/ai-img-gen");
+      }
+      catch(error)
+      {
+        alert(error);
+      }
+      finally
+      {
+        setLoading(false);
+      }
+    }
+    else
+    {
+      alert("Please enter a prompt and generate an image.");
+    }
   }
 
   const handleChange = (e: any) => {
@@ -67,7 +111,7 @@ export default function Page() {
         </div>
         <div className="mt-10">
           <p className='mt-2 text-[#666e75] text-[14px]'>Once you have created the image you want, you can share it with others in the community</p>
-          <button className='mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center' type='submit'>{loading ? "Sharing..." : "Share with the community"}</button>
+          <button className='mt-3 text-white bg-[#6469ff] font-medium rounded-md text-sm w-full sm:w-auto px-5 py-2.5 text-center' type='button' onClick={handleSubmit}>{loading ? "Sharing..." : "Share with the community"}</button>
         </div>
       </form>
     </section>

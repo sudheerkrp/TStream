@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Loader from "../../../components/shared/Loader";
 import Card from "../../../components/cards/Card";
 import FormField from "../../../components/forms/FormField";
+import { fetchAllAIImages } from "@/lib/actions/aiImage.actions";
 
 const RenderCard = ({data, title}: {data: Array<string>, title: string}) => {
 	if(data?.length > 0)
@@ -14,9 +15,30 @@ const RenderCard = ({data, title}: {data: Array<string>, title: string}) => {
 }
 
 const Page = () => {
+	const emptyArr: any[] = [];
 	const [loading, setLoading] = useState(false);
-	const [allPosts, setAllPosts] = useState(null);
+	const [allAIImages, setAllAIImages] = useState(emptyArr);
 	const [searchText, setSearchText] = useState("");
+
+	useEffect(() =>{
+		const fetchAIImages = async () => {
+			setLoading(true);
+			try
+			{
+				const data = await fetchAllAIImages();
+				setAllAIImages(data.reverse());
+			}
+			catch (error)
+			{
+				alert(error);
+			}
+			finally
+			{
+				setLoading(false);
+			}
+		}
+		fetchAIImages();
+	}, []);
 
 	return (
 		<section className="max-w-7xl mx-auto">
@@ -44,10 +66,10 @@ const Page = () => {
 							</h2>
 						)} 
 						<div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
-							{searchText ? (
+							{searchText !== "" ? (
 								<RenderCard data={[]} title="No search results found" />
 							): (
-								<RenderCard data={[]} title="No posts found" />
+								<RenderCard data={allAIImages} title="No posts found" />
 							)}
 						</div>
 					</>
