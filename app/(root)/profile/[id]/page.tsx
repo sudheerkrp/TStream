@@ -1,12 +1,11 @@
-import PostStream from "@/components/forms/PostStream";
-import ProfileHeader from "@/components/shared/ProfileHeader";
-import StreamsTab from "@/components/shared/StreamsTab";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { profileTabs } from "@/constants";
-import { fetchUser } from "@/lib/actions/user.actions";
-import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
+import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
+import { profileTabs } from "@/constants";
+import StreamsTab from "@/components/shared/StreamsTab";
+import ProfileHeader from "@/components/shared/ProfileHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetchUser } from "@/lib/actions/user.actions";
 
 const Page = async ({ params }: {params: {id: string}}) => {
     const user = await currentUser();
