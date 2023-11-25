@@ -27,8 +27,15 @@ export default function Page() {
       {
         setGeneratingImg(true);
         const photo = await generateAIImage(form.prompt);
-        setForm({...form, photo: `data:image/jpeg;base64,${photo?.image}`});
-        setCloudinaryUrl(photo?.url);
+        if(photo)
+        {
+          setForm({...form, photo: `data:image/jpeg;base64,${photo.image}`});
+          setCloudinaryUrl(photo.url);
+        }
+        else
+        {
+          alert("Server not responding. Timeout!");
+        }
       }
       catch(err) 
       {
