@@ -27,8 +27,8 @@ export default function Page() {
       {
         setGeneratingImg(true);
         const photo = await generateAIImage(form.prompt);
-        setForm({...form, photo: `data:image/jpeg;base64,${photo.image}`});
-        setCloudinaryUrl(photo.url);
+        setForm({...form, photo: `data:image/jpeg;base64,${photo?.image}`});
+        setCloudinaryUrl(photo?.url);
       }
       catch(err) 
       {
