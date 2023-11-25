@@ -48,12 +48,12 @@ export default function Page()
         
           const currentForm = formRef.current;
           if (currentForm) {
-            currentForm.addEventListener('keyup', handleKeyUp);
+            window.addEventListener('keyup', handleKeyUp);
           }
         
           return () => {
             if (currentForm) {
-              currentForm.removeEventListener('keyup', handleKeyUp);
+              window.removeEventListener('keyup', handleKeyUp);
             }
           };
 	}, []);
