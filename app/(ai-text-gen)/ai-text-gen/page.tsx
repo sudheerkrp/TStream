@@ -1,6 +1,7 @@
 "use client"
+import { generateAIText } from "@/lib/actions/openAI.actions";
 import { send, bot, user } from "@/public/assets";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect} from "react";
 
 interface Conversation 
 {
@@ -30,62 +31,52 @@ const ChatStripe = ({isAi, value}: Props) => {
 
 export default function Page() 
 {
-    const [loadInterval, setLoadInterval] = useState<any>(undefined);
-    const [loaderContent, setLoaderContent] = useState("");
-    const [prevConversation, setPrevConversation] = useState<Conversation[]>([{prompt: "Hello", response: "Hi there!", uniqueId: "xxx1233"}]);
+    const [prevConversation, setPrevConversation] = useState<Conversation[]>([]);
     const [response, setResponse] = useState("");
-    const [prompt, setPrompt] = useState("");
+    const [promptTxt, setPromptTxt] = useState("");
     const [formTxt, setFormTxt] = useState("");
+    const [typing, setTyping] = useState(false);
 
-    const formRef = useRef<HTMLFormElement>(null);
+    const Ref = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        if(Ref && Ref.current)
+            Ref.current.scrollTop = Ref.current.scrollHeight;
+    };
 
     useEffect(() => {
-		const handleKeyUp = (event: KeyboardEvent) => {
-            if (event.keyCode === 13) {
-              handleSubmit(event);
-            }
-          };
-        
-          const currentForm = formRef.current;
-          if (currentForm) {
-            window.addEventListener('keyup', handleKeyUp);
-          }
-        
-          return () => {
-            if (currentForm) {
-              window.removeEventListener('keyup', handleKeyUp);
-            }
-          };
-	}, []);
+        scrollToBottom();
+      }, [response]);
 
-    const loader = () => {
-        setLoaderContent("");
-        setLoadInterval(setInterval(() => {
-            setLoaderContent(loaderContent+".");
-            if(loaderContent === "....")
-                setLoaderContent("");
-        }, 300));
-    }
-
-    const typeText = (text: string) => {
+    const typeText = (questionText: string, ansText: string) => {
         let index = 0;
         setResponse("");
+        setPromptTxt(questionText);
+        setTyping(true);
+        scrollToBottom();
         let interval = setInterval(() => {
-            if(index < text.length)
+            if(index < ansText.length)
             {
-                setResponse(response+text.charAt(index));
+                setResponse(ansText.substring(0, index+1));
                 index++;
             }
             else
             {
                 let newConversation = prevConversation;
-                newConversation.push({prompt: prompt, response: response, uniqueId: generateUniqueId()});
-                setPrompt("");
+                newConversation.push({prompt: questionText, response: ansText, uniqueId: generateUniqueId()});
+                setPromptTxt("");
                 setResponse("");
                 setPrevConversation(newConversation);
+                setTyping(false);
                 clearInterval(interval);
             }
-        }, 20);
+        }, 10);
+    }
+
+    const generateTxt = async (questionText: string) => {
+        let data = await generateAIText(questionText);
+        data = data.trim();
+        typeText(questionText, data);
     }
 
     const generateUniqueId = () => {
@@ -97,13 +88,11 @@ export default function Page()
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        console.log("FormTxt: ", formTxt);
-        setPrompt(formTxt);
-        console.log("Prompt: ", prompt);
-        setFormTxt("");
-
-        const data = "Hello, I am doing fine, what about you!";
-        typeText(data);
+        if(formTxt !== '')
+        {
+            await generateTxt(formTxt);
+            setFormTxt("");
+        }
     }
 
     const handleChange = async (e: any) => {
@@ -113,24 +102,24 @@ export default function Page()
 
     return (
         <div id="app">
-            <div id="chat_container">
+            <div ref={Ref} id="chat_container">
                 {prevConversation.map((conversation: Conversation) => (
                     <div key={conversation.uniqueId}>
                         <ChatStripe isAi={false} value={conversation.prompt} />
                         <ChatStripe isAi={true} value={conversation.response} />
                     </div>
                 ))}
-                {prompt && (
+                {typing && (
                     <>
-                        <ChatStripe isAi={false} value={prompt} />
+                        <ChatStripe isAi={false} value={promptTxt} />
                         <ChatStripe isAi={true} value={response} />
                     </>
                 )}
             </div>
-            <form ref={formRef} className="ai-text-form">
-                <textarea placeholder="Enter your prompt" value={formTxt} onChange={handleChange} onSubmit={handleSubmit} name="prompt" cols={1} rows={1} className="ai-text-textarea">
+            <form className="ai-text-form">
+                <textarea placeholder="Enter your prompt here ..." value={formTxt} onChange={handleChange} cols={1} rows={1} className="ai-text-textarea">
                 </textarea>
-                <button className="ai-text-button" type="button" onClick={handleSubmit}>
+                <button disabled={typing} className="ai-text-button" type="button" onClick={handleSubmit}>
                     <img src={send.src} alt="Send"/>
                 </button>
             </form>
