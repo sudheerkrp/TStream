@@ -60,8 +60,13 @@ const PostStream = ({ userId }: { userId: string }) => {
                     name="stream"
                     render={({ field }) => (
                         <FormItem className="flex flex-col gap-3 w-full">
-                            <FormLabel className="text-base-semibold text-light-2 ">
-                                Content
+                            <FormLabel>
+                                <span className="text-base-semibold text-light-2">Content</span> 
+                                <span className="text-sm">
+                                    <span className="text-light-2">&nbsp;(Don't have anything in your mind to post? Ask our AI assistant&nbsp;</span>
+                                    <a className="text-[#0000FF]" href="/ai-text-gen">AI-Text-Gen</a>
+                                    <span className="text-light-2">&nbsp; to write for you.)</span>
+                                </span>
                             </FormLabel>
                             <FormControl className="no-focus border border-dark-4 bg-dark-3 text-light-1">
                                 <Textarea rows={15} {...field} />

@@ -45,12 +45,12 @@ const StreamCard = ({ id, currentUserId, parentId, content, author, community, c
                         <p className="mt-2 text-small-regular text-light-2">{content}</p>
                         <div className={`mt-5 flex flex-col gap-3 ${isComment && "mb-10"}`}>
                             <div className="flex gap-3.5">
-                                <Image src="/assets/heart-gray.svg" alt="Heart" width={24} height={24} className="cursor-pointer object-contain" />
+                                {/* <Image src="/assets/heart-gray.svg" alt="Heart" width={24} height={24} className="cursor-pointer object-contain" /> */}
                                 <Link href={`/stream/${id}`}>
                                     <Image src="/assets/reply.svg" alt="Reply" width={24} height={24} className="cursor-pointer object-contain" />
                                 </Link>
-                                <Image src="/assets/repost.svg" alt="Repost" width={24} height={24} className="cursor-pointer object-contain" />
-                                <Image src="/assets/share.svg" alt="Share" width={24} height={24} className="cursor-pointer object-contain" />
+                                {/* <Image src="/assets/repost.svg" alt="Repost" width={24} height={24} className="cursor-pointer object-contain" /> */}
+                                {/* <Image src="/assets/share.svg" alt="Share" width={24} height={24} className="cursor-pointer object-contain" /> */}
                             </div>
 
                             {isComment && comments.length > 0 && (
@@ -65,14 +65,14 @@ const StreamCard = ({ id, currentUserId, parentId, content, author, community, c
                 </div>
             </div>
             {/* To-Do: Delete Stream */}
-            {!isComment && community && (
+            {/* {!isComment && community && (
                 <Link href={`/communities/${community.id}`} className="mt-5 flex items-center" >
                     <p className="text-subtle-medium text-gray-1">
                         {formatDateString(createdAt)}&nbsp;-&nbsp;{community.name} Community
                     </p>
                     <Image src={community.image} alt={community.name} width={14} height={14} className="ml-1 rounded-full object-cover" />
                 </Link>
-            )}
+            )} */}
         </article>
     );
 }

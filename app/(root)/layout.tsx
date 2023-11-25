@@ -10,8 +10,8 @@ import Bottombar from "@/components/shared/Bottombar";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'TStream',
-  description: 'TStream, a social media platform.'
+  title: 'TStream | Social Media',
+  description: 'TStream, a social media platform with extraordinary AI features.'
 }
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
               {children}
               </div>
             </section>
-            <RightSidebar />
+            {/* <RightSidebar /> */}
           </main>
           <Bottombar />
         </body>
