@@ -15,13 +15,25 @@ cloudinary.config({
 
 export async function generateAIImage(prompt: string) {
   try {
-    const aiResponse = await openai.images.generate({ prompt, n: 1, size: '1024x1024', response_format: 'b64_json' });
-    const image = aiResponse.data[0].b64_json;
-    const photoUrl = await cloudinary.uploader.upload(`data:image/jpeg;base64,${image}`);
+    // const aiResponse = await openai.images.generate({ prompt, n: 1, size: '1024x1024', response_format: 'b64_json' });
+    // const image = aiResponse.data[0].b64_json;
+    // const photoUrl = await cloudinary.uploader.upload(`data:image/jpeg;base64,${image}`);
     // connectToDB();
     // const newAIImage = await AiImage.create({name, prompt, photo: photoUrl.url});
     // await newAIImage.save();
-    return { image: image, url: photoUrl.url };
+
+    const aiResponse = await openai.images.generate({ prompt, n: 1, size: '1024x1024', response_format: 'url' });
+    const image = aiResponse?.data[0]?.url?.toString();
+    if(image)
+    {
+      const photoUrl = await cloudinary.uploader.upload(image);
+      return photoUrl.url;
+    }
+    else
+    {
+      console.error("Error while generating AI image.");
+      throw new Error("Unable to generate AI image.");
+    }
   } catch (err) {
     console.error("Error while generating AI image:", err);
     throw new Error("Unable to generate AI image.");
